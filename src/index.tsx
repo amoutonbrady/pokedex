@@ -105,10 +105,11 @@ const App: Component = () => {
   const [pokemon, loadPokemon] = createResource<Pokemon>(null);
   const [search, setSearch] = createSignal("");
 
-  createEffect(() => {
+  createComputed(() => {
     const hasSearchStarted = !!search().length;
     const isPokemonSelected = !!pokemon() || pokemon.loading;
     const pokemonsLoaded = !!pokemons().length;
+    console.log(pokemon());
 
     if (!pokemonsLoaded || hasSearchStarted || isPokemonSelected) return;
 
@@ -117,7 +118,7 @@ const App: Component = () => {
     loadPokemon(fetchPokemon(first.name));
   });
 
-  createEffect(() => {
+  createComputed(() => {
     const pokemon = findPokemon(search());
     if (!pokemon) return;
     setSearch("");
