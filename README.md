@@ -1,8 +1,6 @@
-# Parcel 2 Solid Starter
+# Pokédex
 
-Great DX + performances out of the box
-
-Uses yarn 2 out of the box, literally 0 install to-do
+Part of [the weekly projects](https://github.com/florinpop17/weekly-projects).
 
 ## Usage
 
