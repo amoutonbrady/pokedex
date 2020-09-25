@@ -155,7 +155,7 @@ const App: Component = () => {
             onInput={(e) => setSearch(e.target.value)}
             classList={{ "is-error": !isSearchValid() }}
           />
-          <datalist id="pokemons-list" class="w-full">
+          <datalist id="pokemons-list">
             <For each={pokemons()}>{(pokemon) => <option value={pokemon.name} />}</For>
           </datalist>
           <button type="submit" class="sr-only">
