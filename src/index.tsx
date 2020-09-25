@@ -173,6 +173,12 @@ const App: Component = () => {
             />
           </Show>
         </div>
+
+        <footer class="flex justify-end">
+          <a href="https://github.com/amoutonbrady/pokedex" target="_blank" rel="noopener">
+            source
+          </a>
+        </footer>
       </div>
     </main>
   );
