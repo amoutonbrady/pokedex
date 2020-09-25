@@ -1,4 +1,14 @@
-import { Component, createEffect, createResource, createSignal, For, Show } from "solid-js";
+import {
+  Component,
+  createEffect,
+  createResource,
+  createSelector,
+  createSignal,
+  For,
+  Match,
+  Show,
+  Switch,
+} from "solid-js";
 import { render } from "solid-js/dom";
 import { Pokedex } from "@amoutonbrady/pokeapi";
 import { Pokemon, Sprites, Stat } from "./types/pokemon";
@@ -9,6 +19,19 @@ const pokedex = new Pokedex();
 const fetchPokemons = () =>
   pokedex.getPokemonsList({ limit: 151, offset: 0 }).then(({ results }) => results);
 const fetchPokemon = (name: string) => () => pokedex.getPokemonByName(name);
+const fetchDescription = (name: string) => () =>
+  pokedex
+    .getPokemonSpeciesByName(name)
+    .then(
+      ({ flavor_text_entries }) =>
+        [
+          ...new Set(
+            flavor_text_entries
+              .filter((desc) => desc.language.name === "en")
+              .map(({ flavor_text }) => flavor_text.replace(/(|)/g, ""))
+          ),
+        ] as string[]
+    );
 
 // -- Utils
 const isString = (str: unknown): str is string => typeof str === "string";
@@ -42,11 +65,11 @@ const PokemonSprites: Component<PokemonSpritesProps> = (props) => {
   );
 
   return (
-    <div class="nes-container with-title is-rounded">
-      <h2 class="title">{props.isLoading ? "Loading..." : "Sprites"}</h2>
+    <div class="nes-container with-title is-rounded flex flex-col" style="max-height: 65vh">
+      <h2 class="title w-0">{props.isLoading ? "Loading..." : "Sprites"}</h2>
 
       <Show when={!props.isLoading} fallback={<Loader />}>
-        <ul class="grid grid-cols-4 gap-4 overflow-auto" style="max-height: 50vh">
+        <ul class="grid grid-cols-4 gap-4 overflow-auto flex-1">
           <For each={flattenSprites()} children={Row} />
         </ul>
       </Show>
@@ -56,8 +79,17 @@ const PokemonSprites: Component<PokemonSpritesProps> = (props) => {
 
 type PokemonDetailsProps = { pokemon: Pokemon; isLoading: boolean };
 const PokemonDetails: Component<PokemonDetailsProps> = (props) => {
+  const [descriptions, loadDescriptions] = createResource<string[]>([]);
+  const [tab, setTab] = createSignal(1);
+  const isSelected = (t: number) => tab() === t;
+
+  createComputed(() => {
+    if (!isSelected(3)) return;
+    loadDescriptions(fetchDescription(props.pokemon.name));
+  });
+
   const StatRow = (stat: Stat) => (
-    <li class="flex flex-col">
+    <li class="flex flex-col pr-4">
       <div class="flex justify-between items-start">
         <label for={stat.stat.name} class="capitalize mr-auto">
           {stat.stat.name}
@@ -67,7 +99,7 @@ const PokemonDetails: Component<PokemonDetailsProps> = (props) => {
       <progress
         id={stat.stat.name}
         value={stat.base_stat}
-        class="nes-progress h-6"
+        class="nes-progress h-6 max-w-full"
         classList={{
           "is-success": stat.base_stat >= 50,
           "is-warning": stat.base_stat >= 25 && stat.base_stat < 50,
@@ -79,18 +111,72 @@ const PokemonDetails: Component<PokemonDetailsProps> = (props) => {
   );
 
   return (
-    <div class="nes-container with-title is-rounded">
-      <h2 class="title capitalize">{props.isLoading ? "loading..." : props.pokemon.name}</h2>
+    <div
+      class="nes-container with-title is-rounded relative flex flex-col"
+      style="max-height: 65vh"
+    >
+      <h2 class="title w-0 capitalize mr-auto">
+        {props.isLoading ? "loading..." : props.pokemon.name}
+      </h2>
 
       <Show when={!props.isLoading} fallback={<Loader />}>
-        <ul>
-          <li>Height: {props.pokemon.height / 10}m</li>
-          <li>Weight: {props.pokemon.weight / 10}kg</li>
-        </ul>
+        <div class="flex justify-between space-x-3">
+          <button
+            onClick={[setTab, 1]}
+            class="nes-btn text-xs uppercase"
+            classList={{ "is-primary": isSelected(1) }}
+          >
+            Stat.
+          </button>
+          <button
+            onClick={[setTab, 2]}
+            class="nes-btn text-xs uppercase"
+            classList={{ "is-primary": isSelected(2) }}
+          >
+            Abil.
+          </button>
+          <button
+            onClick={[setTab, 3]}
+            class="nes-btn text-xs uppercase"
+            classList={{ "is-primary": isSelected(3) }}
+          >
+            Desc.
+          </button>
+        </div>
+        <Switch>
+          <Match when={isSelected(1)}>
+            <ul class="mt-4">
+              <li>Height: {props.pokemon.height / 10}m</li>
+              <li>Weight: {props.pokemon.weight / 10}kg</li>
+            </ul>
 
-        <ul class="flex flex-col space-y-4 mt-6">
-          <For each={props.pokemon.stats} children={StatRow} />
-        </ul>
+            <ul class="flex flex-col space-y-4 mt-6 flex-1 overflow-auto">
+              <For each={props.pokemon.stats} children={StatRow} />
+            </ul>
+          </Match>
+          <Match when={isSelected(2)}>
+            <h3 class="mt-4">Abilities</h3>
+            <ul class="mt-2 flex flex-col space-y-4">
+              <For each={props.pokemon.abilities}>
+                {({ ability }) => <li class="text-sm">{ability.name}</li>}
+              </For>
+            </ul>
+
+            <h3 class="mt-6">Moves</h3>
+            <ul class="mt-2 flex-1 overflow-auto flex flex-col space-y-4">
+              <For each={props.pokemon.moves}>
+                {({ move }) => <li class="text-sm">{move.name}</li>}
+              </For>
+            </ul>
+          </Match>
+          <Match when={isSelected(3)}>
+            <Show when={!descriptions.loading} fallback={<Loader />}>
+              <div class="flex flex-col space-y-4 py-4 whitespace-pre-line overflow-auto flex-1">
+                <For each={descriptions()}>{(desc) => <p class="text-sm" innerHTML={desc} />}</For>
+              </div>
+            </Show>
+          </Match>
+        </Switch>
       </Show>
     </div>
   );
@@ -135,7 +221,7 @@ const App: Component = () => {
   return (
     <main class="container mx-auto py-12 px-2 md:px-8">
       <div class="nes-container is-rounded with-title bg-white">
-        <h1 class="title">Pokédex</h1>
+        <h1 class="title w-0">Pokédex</h1>
 
         <form
           class="nes-field"

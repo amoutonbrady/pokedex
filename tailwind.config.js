@@ -4,7 +4,6 @@ module.exports = {
     purgeLayersByDefault: true,
   },
   purge: {
-    enable: process.env.PURGE_CSS === "true",
     mode: "layers",
     layers: ["base", "components", "utilities"],
     content: ["src/**/*.html", "src/**/*.tsx"],

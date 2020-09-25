@@ -45,7 +45,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@parcel/config-default", "virtual:bb17d83990d687790d6384e46b41060316e25f26c85db0fe5e29cfeba8af1957f9aa779dbd4714408d5d029dccabae51b29c4cb92b632e2eebc60c281024cf2c#npm:2.0.0-nightly.410"],
             ["autoprefixer", "npm:9.8.6"],
             ["babel-preset-solid", "npm:0.20.0"],
-            ["cross-env", "npm:7.0.2"],
             ["nes.css", "npm:2.3.0"],
             ["parcel", "npm:2.0.0-nightly.408"],
             ["solid-js", "npm:0.20.0"],
@@ -4521,16 +4520,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
-      ["cross-env", [
-        ["npm:7.0.2", {
-          "packageLocation": "./.yarn/cache/cross-env-npm-7.0.2-1e9c9fdbca-624d638db3.zip/node_modules/cross-env/",
-          "packageDependencies": [
-            ["cross-env", "npm:7.0.2"],
-            ["cross-spawn", "npm:7.0.3"]
-          ],
-          "linkType": "HARD",
-        }]
-      ]],
       ["cross-spawn", [
         ["npm:6.0.5", {
           "packageLocation": "./.yarn/cache/cross-spawn-npm-6.0.5-2deab6c280-05fbbf957d.zip/node_modules/cross-spawn/",
@@ -7935,7 +7924,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@parcel/config-default", "virtual:bb17d83990d687790d6384e46b41060316e25f26c85db0fe5e29cfeba8af1957f9aa779dbd4714408d5d029dccabae51b29c4cb92b632e2eebc60c281024cf2c#npm:2.0.0-nightly.410"],
             ["autoprefixer", "npm:9.8.6"],
             ["babel-preset-solid", "npm:0.20.0"],
-            ["cross-env", "npm:7.0.2"],
             ["nes.css", "npm:2.3.0"],
             ["parcel", "npm:2.0.0-nightly.408"],
             ["solid-js", "npm:0.20.0"],
